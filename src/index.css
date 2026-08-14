@@ -1,0 +1,57 @@
+@import "tailwindcss";
+@import "@fontsource-variable/archivo";
+@import "@fontsource-variable/source-sans-3";
+@import "@fontsource/ibm-plex-mono/400.css";
+
+@theme {
+  --color-night: #141225;
+  --color-dusk: #2a2140;
+  --color-rose: #7a3a4e;
+  --color-ember: #e8623c;
+  --color-indigo-ink: #8390be;
+  --color-ink: #f2ede8;
+  --color-ink-2: #b4b0c8;
+
+  --font-display: "Archivo Variable", system-ui, sans-serif;
+  --font-body: "Source Sans 3 Variable", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-night);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ember);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
