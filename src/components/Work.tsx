@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { site } from "../content";
+import { useFocusArrival } from "../hooks/useFocusArrival";
 import Section from "./Section";
 import { subscribeScroll } from "../lib/scrollDriver";
 
@@ -16,6 +17,8 @@ export default function Work() {
   const routeRef = useRef<HTMLDivElement | null>(null);
   const lineRef = useRef<HTMLSpanElement | null>(null);
   const [litCount, setLitCount] = useState(0);
+  const [activeStop, setActiveStop] = useState(-1);
+  const { ref: focusRef, focused } = useFocusArrival<HTMLDivElement>();
 
   useEffect(() => {
     const container = routeRef.current;
@@ -25,6 +28,7 @@ export default function Work() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       line.style.transform = "scaleY(1)";
       setLitCount(site.roles.length);
+      setActiveStop(site.roles.length - 1);
       return;
     }
 
@@ -48,15 +52,17 @@ export default function Work() {
       // Functional update bails out when unchanged — at most 3 re-renders
       // across the entire scroll through this section.
       setLitCount((prev) => (prev === lit ? prev : lit));
+      setActiveStop((prev) => (prev === lit - 1 ? prev : lit - 1));
     });
   }, []);
 
   return (
     <Section id="work" meta={site.sections.work}>
-      <div
-        ref={routeRef}
-        className="relative flex flex-col gap-12 border-l border-white/10 pl-7 sm:pl-10"
-      >
+      <div ref={focusRef}>
+        <div
+          ref={routeRef}
+          className="relative flex flex-col gap-12 border-l border-white/10 pl-7 sm:pl-10"
+        >
         {/* the travelled part of the route, drawn over the faint full line */}
         <span
           ref={lineRef}
@@ -64,12 +70,18 @@ export default function Work() {
           className="absolute top-0 -left-px h-full w-px origin-top bg-gradient-to-b from-ember/80 via-ember/60 to-ember/30"
           style={{ transform: "scaleY(0)" }}
         />
-        {site.roles.map((role, i) => (
-          <article
-            key={`${role.org}-${role.startYear}`}
-            data-route-stop
-            className="relative"
-          >
+          {site.roles.map((role, i) => {
+            const active = focused && (activeStop === i || (activeStop < 0 && i === 0));
+            return (
+              <article
+                key={`${role.org}-${role.startYear}`}
+                data-route-stop
+                className={`relative rounded-r-md py-1 pr-4 transition-[background-color,box-shadow,opacity,transform] duration-700 ${
+                  active
+                    ? "focus-arrival translate-x-1 bg-ember/5 shadow-[inset_2px_0_0_rgba(232,98,60,0.80),0_14px_32px_-26px_rgba(232,98,60,0.70)]"
+                    : "opacity-80"
+                }`}
+              >
             {/* waypoint dot — ignites as the route line reaches it */}
             <span
               aria-hidden="true"
@@ -95,8 +107,10 @@ export default function Work() {
                 </li>
               ))}
             </ul>
-          </article>
-        ))}
+              </article>
+            );
+          })}
+        </div>
       </div>
       <a
         href={site.resumeHref}

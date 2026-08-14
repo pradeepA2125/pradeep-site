@@ -10,7 +10,9 @@ import { subscribeScroll } from "../lib/scrollDriver";
  * come out over the work, the interstitial sits at the darkest point, and
  * first light returns behind a ridge as the page reaches the contact section.
  *
- * Four fixed gradient layers stacked once, cross-faded by OPACITY ONLY.
+ * Fixed gradient layers cross-fade by OPACITY ONLY. The celestial beat is an
+ * eclipse forming in one corner of the sky, rather than an object tracking
+ * across the reading column for the whole page.
  * Animating gradient colours directly would repaint a full viewport every
  * scroll frame; opacity is composited, so this costs the GPU almost nothing
  * and never touches layout.
@@ -30,54 +32,73 @@ const plateau = (t: number, a: number, b: number, c: number, d: number) =>
 const window3 = (t: number, a: number, peak: number, b: number) =>
   t <= peak ? ramp(t, a, peak) : 1 - ramp(t, peak, b);
 
-/**
- * The moon's traverse. It clears the ridge on the right as night settles,
- * arcs overhead at the darkest point of the page, and has set on the left
- * before first light — so the sky is never lit by both at once.
- */
-const MOON_RISE = 0.13;
-const MOON_PEAK = 0.52;
-const MOON_SET = 0.87;
+const ECLIPSE_IN = 0.27;
+const ECLIPSE_FULL = 0.51;
+const ECLIPSE_OUT = 0.77;
 
 export default function Atmosphere() {
   const duskRef = useRef<HTMLDivElement | null>(null);
   const nightRef = useRef<HTMLDivElement | null>(null);
-  const starsRef = useRef<HTMLDivElement | null>(null);
-  const moonRef = useRef<HTMLDivElement | null>(null);
+  const distantStarsRef = useRef<HTMLDivElement | null>(null);
+  const nearStarsRef = useRef<HTMLDivElement | null>(null);
+  const starTrailsRef = useRef<HTMLDivElement | null>(null);
+  const eclipseRef = useRef<HTMLDivElement | null>(null);
+  const occluderRef = useRef<HTMLDivElement | null>(null);
+  const coronaRef = useRef<HTMLDivElement | null>(null);
+  const meteorRef = useRef<HTMLDivElement | null>(null);
   const dawnRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const layers = [duskRef, nightRef, starsRef, moonRef, dawnRef].map(
+    const layers = [
+      duskRef,
+      nightRef,
+      distantStarsRef,
+      nearStarsRef,
+      starTrailsRef,
+      eclipseRef,
+      occluderRef,
+      coronaRef,
+      meteorRef,
+      dawnRef,
+    ].map(
       (r) => r.current,
     );
     if (layers.some((l) => !l)) return;
-    const [dusk, night, stars, moon, dawn] = layers as HTMLDivElement[];
+    const [dusk, night, distantStars, nearStars, starTrails, eclipse, occluder, corona, meteor, dawn] = layers as HTMLDivElement[];
 
-    /** Right horizon -> overhead -> left horizon, as a parabola over the sky. */
-    const placeMoon = (t: number) => {
-      const arc = Math.min(
-        1,
-        Math.max(0, (t - MOON_RISE) / (MOON_SET - MOON_RISE)),
-      );
-      const x = 84 - arc * 72;
-      const y = 84 - Math.sin(arc * Math.PI) * 70;
-      moon.style.transform = `translate3d(${x}vw, ${y}vh, 0)`;
-      // A moon is bright for its whole crossing — it only dims at the
-      // horizons. A triangular fade left it near-invisible for most of the
-      // traverse (0.18 rising, 0.14 setting), so it read as a glow rather
-      // than an object you can follow.
-      moon.style.opacity = String(
-        plateau(t, MOON_RISE, MOON_RISE + 0.07, MOON_SET - 0.12, MOON_SET),
-      );
+    /** A short, cinematic eclipse beat that stays away from the copy. */
+    const placeEclipse = (t: number) => {
+      const presence = plateau(t, ECLIPSE_IN, ECLIPSE_IN + 0.08, ECLIPSE_OUT - 0.10, ECLIPSE_OUT);
+      const phase = ramp(t, ECLIPSE_IN + 0.04, ECLIPSE_FULL);
+      const totality = window3(t, 0.43, 0.56, 0.69);
+      const meteorBeat = window3(t, 0.50, 0.56, 0.64);
+
+      // The body barely moves: the world changes beneath it, instead of a
+      // decorative sticker travelling across the viewport.
+      eclipse.style.opacity = String(presence * 0.92);
+      eclipse.style.transform = `translate3d(${76 + phase * 1.5}vw, ${12 - phase * 2}vh, 0) scale(${0.78 + presence * 0.22})`;
+      occluder.style.transform = `translate3d(${(-72 + phase * 75).toFixed(2)}%, ${(-5 + phase * 4).toFixed(2)}%, 0)`;
+      corona.style.opacity = String(totality * 0.92);
+      corona.style.transform = `scale(${0.86 + totality * 0.24}) rotate(${phase * 42}deg)`;
+
+      // One brief meteor sweep gives totality a payoff without creating a
+      // second full-page travelling object.
+      meteor.style.opacity = String(Math.pow(Math.max(0, meteorBeat), 0.65) * 0.82);
+      meteor.style.transform = `translate3d(${105 - meteorBeat * 115}vw, ${-6 + meteorBeat * 50}vh, 0) rotate(145deg)`;
     };
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      // The settled middle of the journey — night, stars out, moon overhead.
+      // The settled middle of the journey: a quiet total eclipse, no sweep.
       dusk.style.opacity = "0";
       night.style.opacity = "1";
-      stars.style.opacity = "0.5";
+      distantStars.style.opacity = "0.5";
+      distantStars.style.transform = "translate3d(0, 7vh, 0)";
+      nearStars.style.opacity = "0.32";
+      nearStars.style.transform = "translate3d(-8vw, 18vh, 0)";
+      starTrails.style.opacity = "0";
       dawn.style.opacity = "0";
-      placeMoon(MOON_PEAK);
+      placeEclipse(ECLIPSE_FULL);
+      meteor.style.opacity = "0";
       return;
     }
 
@@ -89,10 +110,21 @@ export default function Atmosphere() {
       dusk.style.opacity = String(1 - ramp(t, 0.04, 0.30));
       // Night deepens through building and work, deepest at the interstitial.
       night.style.opacity = String(window3(t, 0.10, 0.58, 0.99));
-      // Stars emerge over the work and fade out as first light arrives.
-      stars.style.opacity = String(window3(t, 0.18, 0.56, 0.90));
-      // The moon crosses while the page is at its darkest.
-      placeMoon(t);
+      // The far layer moves slowly enough to feel like true sky distance.
+      const nightSky = window3(t, 0.18, 0.56, 0.90);
+      distantStars.style.opacity = String(nightSky * 0.88);
+      distantStars.style.transform = `translate3d(${t * -3.2}vw, ${t * 15}vh, 0)`;
+
+      // A second, sparse layer moves much faster. The difference in speed
+      // creates a hyperlapse-like parallax without turning the sky into a
+      // distracting warp tunnel.
+      nearStars.style.opacity = String(nightSky * 0.42);
+      nearStars.style.transform = `translate3d(${t * -18}vw, ${t * 42}vh, 0)`;
+      const totality = window3(t, 0.44, 0.56, 0.68);
+      starTrails.style.opacity = String(totality * 0.34);
+      starTrails.style.transform = `translate3d(${t * -21}vw, ${t * 48}vh, 0)`;
+      // The sky reaches totality at the darkest point of the page.
+      placeEclipse(t);
       // First light breaks only at the very end, behind the contact section.
       dawn.style.opacity = String(ramp(t, 0.74, 0.99));
     });
@@ -120,12 +152,13 @@ export default function Atmosphere() {
             "linear-gradient(to bottom, #0a0913 0%, #070610 45%, #05040c 100%)",
         }}
       />
-      {/* stars — a few fixed radial dots, cheap and static */}
+      {/* Far stars: a slow layer, like an enormous sky beyond the page. */}
       <div
-        ref={starsRef}
-        className="absolute inset-0"
+        ref={distantStarsRef}
+        className="absolute -inset-y-[22%] inset-x-0"
         style={{
           opacity: 0,
+          willChange: "transform, opacity",
           backgroundImage: [
             "radial-gradient(1.7px 1.7px at 12% 18%, rgba(242,237,232,1), transparent 60%)",
             "radial-gradient(1.1px 1.1px at 71% 12%, rgba(242,237,232,0.7), transparent 60%)",
@@ -140,22 +173,104 @@ export default function Atmosphere() {
           ].join(","),
         }}
       />
-      {/* the moon — the one thing that actually moves across the sky */}
+      {/* Near stars: fewer and brighter, so their faster scroll reads as depth. */}
       <div
-        ref={moonRef}
-        className="absolute top-0 left-0 h-28 w-28"
+        ref={nearStarsRef}
+        className="absolute -inset-y-[55%] -inset-x-[16%]"
         style={{
           opacity: 0,
-          marginLeft: "-3.5rem",
-          marginTop: "-3.5rem",
-          willChange: "transform",
-          background:
-            "radial-gradient(circle at 38% 33%, #fffdf7 0%, #f1ead9 44%, #d3ccbc 66%, rgba(190,184,170,0.25) 72%, transparent 74%)",
-          boxShadow:
-            "0 0 70px 26px rgba(228,222,206,0.16), 0 0 160px 70px rgba(160,168,214,0.10)",
-          borderRadius: "9999px",
+          willChange: "transform, opacity",
+          backgroundImage: [
+            "radial-gradient(2.2px 2.2px at 15% 13%, rgba(224,233,255,0.85), transparent 58%)",
+            "radial-gradient(1.8px 1.8px at 61% 25%, rgba(255,239,213,0.78), transparent 58%)",
+            "radial-gradient(2px 2px at 89% 38%, rgba(211,224,255,0.72), transparent 58%)",
+            "radial-gradient(1.8px 1.8px at 34% 56%, rgba(255,239,213,0.72), transparent 58%)",
+            "radial-gradient(2.2px 2.2px at 72% 73%, rgba(224,233,255,0.78), transparent 58%)",
+            "radial-gradient(1.7px 1.7px at 7% 84%, rgba(211,224,255,0.70), transparent 58%)",
+          ].join(","),
         }}
       />
+      {/* The closer stars acquire tiny trails only during totality. */}
+      <div
+        ref={starTrailsRef}
+        className="absolute -inset-y-[55%] -inset-x-[16%]"
+        style={{
+          opacity: 0,
+          willChange: "transform, opacity",
+          backgroundImage: [
+            "linear-gradient(145deg, transparent 46%, rgba(212,225,255,0.72) 49%, transparent 54%)",
+            "linear-gradient(145deg, transparent 67%, rgba(255,233,207,0.62) 70%, transparent 75%)",
+            "linear-gradient(145deg, transparent 79%, rgba(212,225,255,0.58) 82%, transparent 87%)",
+          ].join(","),
+          backgroundSize: "120px 80px, 170px 110px, 210px 140px",
+          backgroundPosition: "10% 14%, 72% 36%, 32% 72%",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
+      {/* A fixed celestial event, deliberately outside the reading column. */}
+      <div
+        ref={eclipseRef}
+        className="absolute top-0 left-0 h-40 w-40 sm:h-52 sm:w-52"
+        style={{
+          opacity: 0,
+          willChange: "transform, opacity",
+        }}
+      >
+        {/* The corona reads before the disk: a more memorable silhouette than a flat moon. */}
+        <div
+          ref={coronaRef}
+          className="absolute -inset-10 rounded-full"
+          style={{
+            opacity: 0,
+            willChange: "transform, opacity",
+            background:
+              "repeating-conic-gradient(from 18deg, rgba(176,192,255,0) 0deg 8deg, rgba(176,192,255,0.20) 10deg 13deg, rgba(245,220,180,0.06) 16deg 21deg, transparent 25deg 33deg)",
+            filter: "blur(1px)",
+          }}
+        />
+        <div
+          className="absolute inset-3 overflow-hidden rounded-full"
+          style={{
+            background:
+              "radial-gradient(circle at 33% 28%, #fcf4db 0%, #d8d5ca 35%, #8d92a1 61%, #4f536d 78%, #232538 100%)",
+            boxShadow: "0 0 36px 10px rgba(194,209,255,0.20), 0 0 100px 30px rgba(91,102,182,0.12)",
+          }}
+        >
+          <div
+            ref={occluderRef}
+            className="absolute -inset-[5%] rounded-full"
+            style={{
+              willChange: "transform",
+              background: "radial-gradient(circle at 42% 42%, #090914 0%, #060610 62%, #171a30 100%)",
+              boxShadow: "-10px 0 24px rgba(147,168,255,0.16)",
+            }}
+          />
+          <div
+            className="absolute inset-0 rounded-full"
+            style={{
+              background:
+                "radial-gradient(circle at 66% 34%, rgba(31,34,53,0.32) 0 5%, transparent 6%), radial-gradient(circle at 77% 45%, rgba(31,34,53,0.18) 0 3%, transparent 4%), radial-gradient(circle at 30% 68%, rgba(31,34,53,0.30) 0 6%, transparent 7%), radial-gradient(circle at 44% 22%, rgba(31,34,53,0.16) 0 2.5%, transparent 3.5%)",
+              mixBlendMode: "multiply",
+            }}
+          />
+        </div>
+      </div>
+
+      {/* A tiny meteor shower arrives only at totality. */}
+      <div
+        ref={meteorRef}
+        className="absolute top-0 left-0 h-px w-40 origin-left"
+        style={{
+          opacity: 0,
+          willChange: "transform, opacity",
+          background:
+            "linear-gradient(90deg, transparent 0%, rgba(157,184,255,0.05) 20%, rgba(233,239,255,0.92) 88%, rgba(255,247,214,1) 100%)",
+          boxShadow: "0 0 8px rgba(192,210,255,0.80)",
+        }}
+      >
+        <span className="absolute right-8 top-5 h-px w-20 bg-gradient-to-r from-transparent to-[#c6d5ff]/70" />
+        <span className="absolute right-16 top-10 h-px w-12 bg-gradient-to-r from-transparent to-[#f4d7af]/65" />
+      </div>
 
       {/* first light, with the far ridge cut out of it */}
       <div ref={dawnRef} className="absolute inset-0" style={{ opacity: 0 }}>

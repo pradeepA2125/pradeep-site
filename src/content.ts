@@ -50,22 +50,22 @@ export const site: SiteContent = {
       name: "Crucible",
       blurb:
         "An agentic coding assistant for VS Code. A FastAPI orchestrator runs ReAct tool loops against isolated shadow workspaces, a Rust indexer builds an LSP-resolved symbol graph across six languages, and a memory layer compacts context and recalls across sessions.",
-      href: "https://github.com/pradeepA2125/crucible",
+      href: "https://crucible-ai.pages.dev",
       stack: ["Python", "TypeScript", "Rust", "MCP"],
       year: "2026",
     },
     {
-      name: "Ask-Git",
+      name: "Ask-Git · IBM Client Engineering",
       blurb:
-        "Conversational code intelligence over Git history — commits, file-level changes, and pull-request metadata across multiple repositories. Adopted into IBM's Client Engineering enablement accelerators.",
+        "A production code-intelligence asset adopted through CE Coach and reused across client engagements. Lets teams query commits, file-level changes, and pull-request metadata across repositories.",
       stack: ["LangChain", "Vector search", "GitHub API"],
       year: "2025",
     },
     {
-      name: "watsonx Orchestrate agents",
+      name: "Client agent products · CI Financial + OPG",
       blurb:
-        "A portfolio of production agents: a LangGraph natural-language-to-SQL tool, a vision-language document extractor, and a call-transcript analyzer producing structured insight across six dimensions.",
-      stack: ["LangGraph", "watsonx", "VLMs"],
+        "Built LangGraph agent products for insurance agents and recruiters: call analysis surfaces policy and sales insight; resume-to-JD matching cut manual review by 40%, then became a reusable watsonx Orchestrate asset.",
+      stack: ["LangGraph", "watsonx Orchestrate", "VLMs"],
       year: "2025",
     },
   ],
@@ -170,7 +170,7 @@ export const site: SiteContent = {
       { label: "Riding", href: "#riding" },
       { label: "Contact", href: "#contact" },
     ],
-    viewSource: "View source →",
+    viewSource: "Visit Crucible →",
     resumeLabel: "Full resume (PDF)",
   },
 };

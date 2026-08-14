@@ -1,4 +1,5 @@
 import { site } from "../content";
+import { useFocusArrival } from "../hooks/useFocusArrival";
 import Section from "./Section";
 
 /**
@@ -7,14 +8,30 @@ import Section from "./Section";
  */
 export default function Building() {
   const [flagship, ...rest] = site.projects;
+  const { ref: flagshipRef, focused } = useFocusArrival<HTMLElement>();
 
   return (
     <Section id="building" meta={site.sections.building}>
-      <article className="group relative overflow-hidden rounded-lg border border-ember/25 bg-gradient-to-br from-dusk/60 via-night to-night p-7 transition-colors duration-500 hover:border-ember/50 sm:p-10">
+      <article
+        ref={flagshipRef}
+        className={`group relative overflow-hidden rounded-lg border bg-gradient-to-br from-dusk/60 via-night to-night p-7 transition-[border-color,box-shadow,transform] duration-700 hover:border-ember/50 sm:p-10 ${
+          focused
+            ? "focus-arrival border-ember/70 shadow-[0_20px_80px_-34px_rgba(232,98,60,0.68)]"
+            : "border-ember/25"
+        }`}
+      >
         {/* quiet ember glow pooling in the corner, brightening on hover */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -top-32 -right-32 h-72 w-72 rounded-full bg-ember/10 blur-3xl transition-opacity duration-700 group-hover:opacity-100 sm:opacity-60"
+          className={`pointer-events-none absolute -top-32 -right-32 h-72 w-72 rounded-full bg-ember/10 blur-3xl transition-opacity duration-700 group-hover:opacity-100 ${
+            focused ? "opacity-100" : "sm:opacity-60"
+          }`}
+        />
+        <span
+          aria-hidden="true"
+          className={`absolute top-0 left-8 h-px w-20 bg-gradient-to-r from-transparent via-ember to-transparent transition-opacity duration-700 ${
+            focused ? "opacity-100" : "opacity-0"
+          }`}
         />
         <div className="relative">
           <div className="mb-3 flex flex-wrap items-baseline gap-x-4 gap-y-1">
