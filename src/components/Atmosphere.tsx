@@ -108,8 +108,12 @@ export default function Atmosphere() {
         <div
           className="absolute inset-0"
           style={{
-            background:
-              "linear-gradient(to top, rgba(232,98,60,0.34) 0%, rgba(122,58,78,0.22) 26%, rgba(42,33,64,0.10) 52%, transparent 78%)",
+            background: [
+              // the low sun's core, right on the ridge line
+              "radial-gradient(120% 62% at 50% 96%, rgba(255,150,86,0.62) 0%, rgba(232,98,60,0.30) 34%, transparent 68%)",
+              // the sky lifting off the horizon
+              "linear-gradient(to top, rgba(232,98,60,0.55) 0%, rgba(150,66,84,0.40) 22%, rgba(58,42,86,0.22) 48%, transparent 76%)",
+            ].join(","),
           }}
         />
         <svg
@@ -119,11 +123,11 @@ export default function Atmosphere() {
         >
           <path
             d="M0 232 L96 205 L214 246 L332 186 L452 231 L560 197 L690 249 L812 208 L946 252 L1064 214 L1192 258 L1318 222 L1440 262 L1440 400 L0 400 Z"
-            fill="#0b0a16"
+            fill="#07060e"
           />
           <path
             d="M0 300 L128 274 L268 312 L404 268 L556 308 L700 272 L858 316 L1002 280 L1160 320 L1304 286 L1440 322 L1440 400 L0 400 Z"
-            fill="#08070f"
+            fill="#040309"
           />
         </svg>
       </div>
