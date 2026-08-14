@@ -22,27 +22,62 @@ import { subscribeScroll } from "../lib/scrollDriver";
 const ramp = (t: number, a: number, b: number) =>
   Math.min(1, Math.max(0, (t - a) / (b - a)));
 
+/** Trapezoid: fades up across [a,b], holds at 1, fades down across [c,d]. */
+const plateau = (t: number, a: number, b: number, c: number, d: number) =>
+  t < b ? ramp(t, a, b) : t <= c ? 1 : 1 - ramp(t, c, d);
+
 /** Triangular window: rises across [a,peak], falls across [peak,b]. */
 const window3 = (t: number, a: number, peak: number, b: number) =>
   t <= peak ? ramp(t, a, peak) : 1 - ramp(t, peak, b);
+
+/**
+ * The moon's traverse. It clears the ridge on the right as night settles,
+ * arcs overhead at the darkest point of the page, and has set on the left
+ * before first light — so the sky is never lit by both at once.
+ */
+const MOON_RISE = 0.13;
+const MOON_PEAK = 0.52;
+const MOON_SET = 0.87;
 
 export default function Atmosphere() {
   const duskRef = useRef<HTMLDivElement | null>(null);
   const nightRef = useRef<HTMLDivElement | null>(null);
   const starsRef = useRef<HTMLDivElement | null>(null);
+  const moonRef = useRef<HTMLDivElement | null>(null);
   const dawnRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const layers = [duskRef, nightRef, starsRef, dawnRef].map((r) => r.current);
+    const layers = [duskRef, nightRef, starsRef, moonRef, dawnRef].map(
+      (r) => r.current,
+    );
     if (layers.some((l) => !l)) return;
-    const [dusk, night, stars, dawn] = layers as HTMLDivElement[];
+    const [dusk, night, stars, moon, dawn] = layers as HTMLDivElement[];
+
+    /** Right horizon -> overhead -> left horizon, as a parabola over the sky. */
+    const placeMoon = (t: number) => {
+      const arc = Math.min(
+        1,
+        Math.max(0, (t - MOON_RISE) / (MOON_SET - MOON_RISE)),
+      );
+      const x = 84 - arc * 72;
+      const y = 84 - Math.sin(arc * Math.PI) * 70;
+      moon.style.transform = `translate3d(${x}vw, ${y}vh, 0)`;
+      // A moon is bright for its whole crossing — it only dims at the
+      // horizons. A triangular fade left it near-invisible for most of the
+      // traverse (0.18 rising, 0.14 setting), so it read as a glow rather
+      // than an object you can follow.
+      moon.style.opacity = String(
+        plateau(t, MOON_RISE, MOON_RISE + 0.07, MOON_SET - 0.12, MOON_SET),
+      );
+    };
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      // The settled middle of the journey — night, stars out, no dawn.
+      // The settled middle of the journey — night, stars out, moon overhead.
       dusk.style.opacity = "0";
       night.style.opacity = "1";
       stars.style.opacity = "0.5";
       dawn.style.opacity = "0";
+      placeMoon(MOON_PEAK);
       return;
     }
 
@@ -56,6 +91,8 @@ export default function Atmosphere() {
       night.style.opacity = String(window3(t, 0.10, 0.58, 0.99));
       // Stars emerge over the work and fade out as first light arrives.
       stars.style.opacity = String(window3(t, 0.18, 0.56, 0.90));
+      // The moon crosses while the page is at its darkest.
+      placeMoon(t);
       // First light breaks only at the very end, behind the contact section.
       dawn.style.opacity = String(ramp(t, 0.74, 0.99));
     });
@@ -103,6 +140,23 @@ export default function Atmosphere() {
           ].join(","),
         }}
       />
+      {/* the moon — the one thing that actually moves across the sky */}
+      <div
+        ref={moonRef}
+        className="absolute top-0 left-0 h-28 w-28"
+        style={{
+          opacity: 0,
+          marginLeft: "-3.5rem",
+          marginTop: "-3.5rem",
+          willChange: "transform",
+          background:
+            "radial-gradient(circle at 38% 33%, #fffdf7 0%, #f1ead9 44%, #d3ccbc 66%, rgba(190,184,170,0.25) 72%, transparent 74%)",
+          boxShadow:
+            "0 0 70px 26px rgba(228,222,206,0.16), 0 0 160px 70px rgba(160,168,214,0.10)",
+          borderRadius: "9999px",
+        }}
+      />
+
       {/* first light, with the far ridge cut out of it */}
       <div ref={dawnRef} className="absolute inset-0" style={{ opacity: 0 }}>
         <div
