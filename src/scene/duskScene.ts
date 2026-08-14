@@ -111,8 +111,17 @@ void main() {
   vec2 uv = gl_FragCoord.xy / uRes;
   float aspect = uRes.x / uRes.y;
 
-  // The descent: as the page scrolls, the last of the light drains out.
-  // "lastLight" gates every warm term so the whole horizon dies together.
+  // The cinematic hold: as the page scrolls through the hero's sticky
+  // track, the camera pulls back from the horizon — the field of view
+  // widens about the sunset focal point and the scene reframes from
+  // "standing on the road" to "watching the whole range". Pure uv-space
+  // zoom: the scene is analytic, so sampling outside [0,1] just yields
+  // more mountain.
+  vec2 focus = vec2(0.5, HORIZON);
+  uv = (uv - focus) * (1.0 + uScroll * 0.30) + focus;
+
+  // ...and the last of the light drains out. "lastLight" gates every warm
+  // term so the whole horizon dies together.
   float lastLight = 1.0 - uScroll * 0.72;
 
   // ---- sky -------------------------------------------------------------

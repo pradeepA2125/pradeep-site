@@ -70,14 +70,21 @@ export default function HeroScene() {
       scene.start();
       setLive(true);
 
-      // Scroll-linked descent: 0 with the hero fully in view → 1 once it has
-      // scrolled past. The hero starts at the top of the page, so scrollY
-      // over the hero height is the whole computation — one clientHeight
-      // read against a clean layout (all scroll-frame writes on this page
-      // are transforms/uniforms, so nothing dirties it mid-frame).
+      // Scroll-linked pull-back: 0 at the top of the page → 1 at the end
+      // of the hero's sticky hold (the [data-hero-track] span), so the
+      // camera finishes its retreat while the stage is still on screen —
+      // the landscape gets its beat alone at full night before the page
+      // moves on. The track starts at the top of the page, so scrollY over
+      // the hold span is the whole computation — one clientHeight read
+      // against a clean layout (all scroll-frame writes on this page are
+      // transform/opacity/filter/uniforms, so nothing dirties it).
       // Skipped under reduced motion (the scene renders one still above).
+      const track = canvas.closest<HTMLElement>("[data-hero-track]");
       unsubscribeScroll = subscribeScroll((scrollY) => {
-        scene.setScroll(scrollY / Math.max(canvas.clientHeight, 1));
+        const span = track
+          ? Math.max(track.clientHeight - window.innerHeight, 1)
+          : Math.max(canvas.clientHeight, 1);
+        scene.setScroll(scrollY / span);
       });
 
       document.addEventListener("visibilitychange", onVisibility);
