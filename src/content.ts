@@ -97,8 +97,8 @@ export const site: SiteContent = {
     photo: {
       src: "/img/stump.webp",
       alt: "Pradeep sitting cross-legged on a fallen tree trunk in dense green forest",
-      width: 1600,
-      height: 1500,
+      width: 1200,
+      height: 1125,
     },
   },
 
@@ -125,8 +125,8 @@ export const site: SiteContent = {
     photo: {
       src: "/img/bike.webp",
       alt: "Pradeep sitting on his orange and black KTM 390 Adventure under pine trees",
-      width: 1200,
-      height: 2133,
+      width: 1000,
+      height: 1778,
     },
   },
 

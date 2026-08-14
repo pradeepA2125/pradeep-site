@@ -11,7 +11,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "oxlint",
-    "check:links": "node scripts/check-links.mjs"
+    "check:links": "node scripts/check-links.mjs",
+    "photos": "node scripts/process-photos.mjs"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +34,7 @@
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.0.5",
     "oxlint": "^1.78.0",
+    "sharp": "^0.34.5",
     "typescript": "~6.0.2",
     "vite": "^8.2.1",
     "vitest": "^3.2.7"

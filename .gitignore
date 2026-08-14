@@ -2,3 +2,7 @@ node_modules/
 dist/
 .DS_Store
 *.tsbuildinfo
+
+# Source photography: large, and bike-original.jpg holds the unredacted
+# registration plate. Only the graded webp output in public/img/ is committed.
+assets-src/
