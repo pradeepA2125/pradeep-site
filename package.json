@@ -34,6 +34,7 @@
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.0.5",
     "oxlint": "^1.78.0",
+    "puppeteer-core": "^24.43.1",
     "sharp": "^0.34.5",
     "typescript": "~6.0.2",
     "vite": "^8.2.1",

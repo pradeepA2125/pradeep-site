@@ -20,6 +20,12 @@ export function useReveal<T extends HTMLElement>() {
       return;
     }
 
+    // Content must never depend on an API the browser might not have.
+    if (typeof IntersectionObserver === "undefined") {
+      setRevealed(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
