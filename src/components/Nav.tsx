@@ -1,4 +1,5 @@
 import { site } from "../content";
+import { handleAnchorClick } from "../lib/scrollToAnchor";
 
 // Derived, not copy: the monogram always tracks the name in content.ts.
 const monogram = site.name
@@ -26,6 +27,7 @@ export default function Nav() {
               <a
                 className="whitespace-nowrap transition-colors hover:text-ember"
                 href={link.href}
+                onClick={(e) => handleAnchorClick(e, link.href)}
               >
                 {link.label}
               </a>

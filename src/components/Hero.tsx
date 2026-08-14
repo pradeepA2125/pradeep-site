@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { site } from "../content";
+import { handleAnchorClick } from "../lib/scrollToAnchor";
 import HeroScene from "./HeroScene";
 import { subscribeScroll } from "../lib/scrollDriver";
 
@@ -112,6 +113,7 @@ export default function Hero() {
               <p className="max-w-xl text-lg leading-relaxed text-ink-2">{body}</p>
               <a
                 href={cta.href}
+                onClick={(e) => handleAnchorClick(e, cta.href)}
                 className="group mt-8 inline-flex items-center gap-3 rounded-full border border-ember/60 bg-night/70 px-6 py-3 font-mono text-sm text-ember backdrop-blur-sm transition-colors hover:bg-ember hover:text-night"
               >
                 {cta.label}
