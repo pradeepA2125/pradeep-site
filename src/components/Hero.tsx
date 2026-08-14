@@ -12,7 +12,7 @@ export default function Hero() {
   const { headline, body, photo, noteCaption, cta, scrollHint } = site.hero;
 
   return (
-    <header className="relative flex min-h-[100svh] items-end overflow-hidden">
+    <header id="top" className="relative flex min-h-[100svh] items-end overflow-hidden">
       <HeroScene />
 
       {/* Single legibility scrim — the scene is dark already. */}

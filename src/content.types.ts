@@ -36,6 +36,16 @@ export interface Photo {
   height: number;
 }
 
+/**
+ * Waypoint header for a section — the expedition-journal motif: a mono
+ * waypoint index, a short eyebrow, and the display title.
+ */
+export interface SectionMeta {
+  waypoint: string;
+  eyebrow: string;
+  title?: string;
+}
+
 export interface SiteContent {
   name: string;
   tagline: string;
@@ -54,7 +64,20 @@ export interface SiteContent {
   roles: Role[];
   resumeHref: string;
   interstitial: { quote: string; attribution: string; photo: Photo };
-  training: { heading: string; body: string; lifts: Lift[]; photo: Photo };
-  riding: { heading: string; body: string; photo: Photo };
-  contact: { heading: string; email: string; links: NamedLink[] };
+  training: { body: string; lifts: Lift[]; photo: Photo };
+  riding: { body: string; routeNote: string; photo: Photo };
+  contact: { email: string; links: NamedLink[] };
+  sections: {
+    evidence: SectionMeta;
+    building: SectionMeta;
+    work: SectionMeta;
+    training: SectionMeta;
+    riding: SectionMeta;
+    contact: SectionMeta;
+  };
+  ui: {
+    navLinks: NamedLink[];
+    viewSource: string;
+    resumeLabel: string;
+  };
 }

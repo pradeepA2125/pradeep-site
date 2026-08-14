@@ -118,7 +118,6 @@ export const site: SiteContent = {
   },
 
   training: {
-    heading: "Training",
     body: "MMA six days a week — striking, wrestling, and Brazilian jiu-jitsu — alongside structured strength work. I care about what the body can actually do, not just what it looks like.",
     lifts: [
       { name: "RDL", value: "170 kg" },
@@ -135,8 +134,8 @@ export const site: SiteContent = {
   },
 
   riding: {
-    heading: "Riding",
     body: "A KTM 390 Adventure and a preference for mountain roads. Long rides are how I get away from screens — Bengaluru to Ooty and back, exploring rather than sightseeing.",
+    routeNote: "Bengaluru → Ooty and back",
     photo: {
       src: asset("/img/bike.webp"),
       alt: "Pradeep sitting on his orange and black KTM 390 Adventure under pine trees",
@@ -146,12 +145,32 @@ export const site: SiteContent = {
   },
 
   contact: {
-    heading: "Get in touch",
     email: "mailto:pradeepkumar94p@gmail.com",
     links: [
       { label: "GitHub", href: "https://github.com/pradeepA2125" },
       { label: "LinkedIn", href: "https://www.linkedin.com/in/pradeepk21" },
       { label: "Crucible", href: "https://github.com/pradeepA2125/crucible" },
     ],
+  },
+
+  sections: {
+    evidence: { waypoint: "01", eyebrow: "The numbers first" },
+    building: { waypoint: "02", eyebrow: "What I build", title: "Building" },
+    work: { waypoint: "03", eyebrow: "Where I've done it", title: "Work" },
+    training: { waypoint: "04", eyebrow: "Off the keyboard", title: "Training" },
+    riding: { waypoint: "05", eyebrow: "Getting away from screens", title: "Riding" },
+    contact: { waypoint: "06", eyebrow: "End of route", title: "Get in touch" },
+  },
+
+  ui: {
+    navLinks: [
+      { label: "Building", href: "#building" },
+      { label: "Work", href: "#work" },
+      { label: "Training", href: "#training" },
+      { label: "Riding", href: "#riding" },
+      { label: "Contact", href: "#contact" },
+    ],
+    viewSource: "View source →",
+    resumeLabel: "Full resume (PDF)",
   },
 };
