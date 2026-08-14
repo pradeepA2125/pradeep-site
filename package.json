@@ -10,7 +10,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "lint": "oxlint"
+    "lint": "oxlint",
+    "check:links": "node scripts/check-links.mjs"
   },
   "keywords": [],
   "author": "",
