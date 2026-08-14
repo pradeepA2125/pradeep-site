@@ -40,7 +40,15 @@ export interface SiteContent {
   name: string;
   tagline: string;
   location: string;
-  hero: { headline: string; body: string; photo: Photo };
+  hero: {
+    headline: string;
+    body: string;
+    /** Field-note card in the hero — the photo plus its caption. */
+    photo: Photo;
+    noteCaption: string;
+    cta: NamedLink;
+    scrollHint: string;
+  };
   metrics: Metric[];
   projects: Project[];
   roles: Role[];

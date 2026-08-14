@@ -33,6 +33,9 @@ export const site: SiteContent = {
       width: 1600,
       height: 2133,
     },
+    noteCaption: "Nilgiri Mountain Railway — the long way up to Ooty",
+    cta: { label: "See what I build", href: "#building" },
+    scrollHint: "Scroll",
   },
 
   metrics: [

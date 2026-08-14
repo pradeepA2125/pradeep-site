@@ -44,6 +44,31 @@ h3 {
   outline-offset: 3px;
 }
 
+::selection {
+  background: color-mix(in srgb, var(--color-ember) 40%, transparent);
+  color: var(--color-ink);
+}
+
+/* hero scroll cue — a slow drop of light down the line */
+@keyframes cue-drop {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  60% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+}
+
+.scroll-cue-line {
+  animation: cue-drop 2.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
