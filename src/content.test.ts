@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { site } from "./content";
 
-const isHttps = (h: string) => /^https:\/\//.test(h);
+const isHttps = (h: string) => h.startsWith("https://");
 
 describe("site content", () => {
   it("has no empty strings anywhere", () => {
