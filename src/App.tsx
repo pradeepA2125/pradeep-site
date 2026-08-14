@@ -1,4 +1,5 @@
 import Nav from "./components/Nav";
+import Atmosphere from "./components/Atmosphere";
 import Hero from "./components/Hero";
 import Evidence from "./components/Evidence";
 import Building from "./components/Building";
@@ -16,6 +17,8 @@ import Contact from "./components/Contact";
 export default function App() {
   return (
     <>
+      {/* The night journey behind everything — see Atmosphere for the arc. */}
+      <Atmosphere />
       <Nav />
       <main>
         <Hero />
