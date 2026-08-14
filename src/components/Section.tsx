@@ -30,7 +30,15 @@ export default function Section({ id, meta, children, className = "" }: Props) {
         <span className="font-mono text-xs tracking-[0.2em] text-ember">
           WP·{meta.waypoint}
         </span>
-        <span aria-hidden="true" className="h-px flex-1 bg-white/10" />
+        {/* Leg line: draws away from the waypoint index on arrival — each
+            header re-plots the route. Reduced motion renders it already
+            drawn (revealed starts true, transitions killed globally). */}
+        <span
+          aria-hidden="true"
+          className={`h-px flex-1 origin-left bg-gradient-to-r from-ember/50 to-white/10 transition-transform duration-[1100ms] ease-out ${
+            revealed ? "scale-x-100" : "scale-x-0"
+          }`}
+        />
         <span className="font-mono text-[0.65rem] tracking-[0.2em] text-indigo-ink uppercase">
           {meta.eyebrow}
         </span>
