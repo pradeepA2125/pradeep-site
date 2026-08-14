@@ -1,0 +1,180 @@
+% Pradeep Kumar — resume (AI Engineer positioning)
+% Compiles with pdfLaTeX on Overleaf.
+%
+% ATS-SAFE BY CONSTRUCTION: single column, no layout tables, no sidebars, no
+% text inside graphics, no header/footer regions, standard section names.
+% Typography and color are invisible to a parser — it reads the text stream.
+%
+% >>> COMPILE WITH pdfLaTeX. <<<  Measured 2026-08-14: under XeTeX/LuaTeX the
+% Lato TTF maps every hyphen to U+2010 in the PDF text layer instead of ASCII
+% U+002D (66 of 68 hyphens), so "multi-agent", "open-source", "cross-encoder"
+% etc. fail a literal keyword search. pdfLaTeX emits ASCII hyphens correctly.
+% Verify after any engine change:  pdftotext resume.pdf - | grep -c 'open-source'
+%
+% See OPEN ITEMS at the end of this file.
+
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[default]{lato}          % swap to \usepackage{XCharter} for a serif look
+\usepackage[margin=0.55in]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{microtype}              % subtler spacing/justification
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+
+\definecolor{accent}{HTML}{1F3864}  % deep navy — prints cleanly in greyscale
+\definecolor{muted}{HTML}{5A5A5A}   % dates, locations
+\definecolor{rulec}{HTML}{B9C3D4}   % hairline under section headings
+
+\hypersetup{colorlinks=true, urlcolor=accent}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\raggedright
+
+% Section headings: small, accent-coloured, hairline rule. Lighter than the
+% body text so headings orient without competing with content.
+\titleformat{\section}
+  {\normalsize\bfseries\color{accent}}{}{0em}{}
+  [\vspace{-5pt}{\color{rulec}\rule{\textwidth}{0.6pt}}]
+\titlespacing*{\section}{0pt}{12pt}{5pt}
+
+\setlist[itemize]{leftmargin=13pt, topsep=3pt, itemsep=3pt, parsep=0pt}
+
+% Role block: title carries the weight, company carries the colour, dates and
+% location recede. Gives the 6-second scan three distinct planes.
+\newcommand{\role}[4]{%
+  \textbf{#1}\hfill{\color{muted}\small #2}\\[1pt]
+  {\color{accent}\bfseries #3}\hfill{\color{muted}\small\itshape #4}\vspace{3pt}
+}
+
+% Project/asset heading in the same visual language as \role.
+% #1 name, #2 one-line description, #3 date, #4 metadata line (link, stack, licence).
+\newcommand{\project}[4]{%
+  {\color{accent}\bfseries #1} — #2\hfill{\color{muted}\small #3}\\[1pt]
+  {\small\color{muted} #4}\vspace{3pt}
+}
+\newcommand{\focus}[1]{\textbf{\color{accent}#1}}
+
+\begin{document}
+
+%======================= HEADER =======================
+\begin{center}
+{\fontsize{22}{24}\selectfont\bfseries\color{accent} PRADEEP KUMAR}\\[3pt]
+{\color{accent}\small AI PRODUCT ENGINEER \,$\cdot$\, FORWARD-DEPLOYED ENGINEER \,$\cdot$\, AGENTIC SYSTEMS}\\[6pt]
+{\footnotesize\color{muted}
+Bengaluru, India \,\textbar\, +91 9980012759 \,\textbar\,
+\href{mailto:pradeepkumar94p@gmail.com}{pradeepkumar94p@gmail.com} \,\textbar\,
+\href{https://www.linkedin.com/in/pradeepk21}{LinkedIn} \,\textbar\,
+\href{https://github.com/pradeepA2125}{GitHub} \,\textbar\,
+\href{https://pradeepa2125.github.io/pradeep-site/}{Portfolio}}
+\end{center}
+%======================= PERSONAL PROJECT =======================
+\section*{PERSONAL PROJECT}
+
+\project{Crucible}{Self-hosted VS Code coding-agent platform}{2026}
+{\href{https://crucible-ai.pages.dev}{crucible-ai.pages.dev} \,\textbar\,
+\href{https://github.com/pradeepA2125/crucible}{GitHub} \,\textbar\,
+Python, TypeScript, Rust \,\textbar\, 14 releases \,\textbar\, Apache 2.0}
+\begin{itemize}
+  \item \focus{Safe agent execution.} Built a FastAPI ReAct orchestrator that performs work in isolated shadow
+        workspaces, requires explicit plan/edit/command/MCP approval, and promotes only reviewed file changes
+        to the user's working tree.
+  \item \focus{Code intelligence and context engineering.} Built a Rust indexer using tree-sitter and live LSP
+        resolution across six language families, exposed as an interactive dependency explorer; added
+        cross-session hybrid memory with sqlite-vec, BM25, reranking, and anchored summaries.
+  \item \focus{Shippable developer product.} Released a self-provisioning VS Code extension and cross-platform
+        runtime that checksum-verifies nine bundled developer tools; supports ten model transports, including
+        local and watsonx providers, with graceful capability degradation and release automation.
+\end{itemize}
+
+%======================= EXPERIENCE =======================
+\section*{EXPERIENCE}
+
+\role{Lead Engineer}{Feb 2024 -- Present}{IBM}{Bengaluru, India}
+\begin{itemize}
+  \item \focus{Platform architecture.} Promoted from Senior AI Engineer to \textbf{Lead Engineer}; led production rollout of
+        Cloud Pak for Data, IBM Knowledge Catalog (now watsonx.data intelligence), watsonx Orchestrate, and
+        watsonx.governance on customer-managed OpenShift for Rogers. Defined high-availability topology,
+        cluster sizing, hardware specifications, prerequisites, and runbooks; used oc and cpd-cli to resolve
+        operator reconciliation failures and deliver a stable, production-ready platform for governed AI and
+        data workloads.
+  \item \focus{Customer AI systems.} Architected and deployed 3+ enterprise-grade RAG systems on watsonx.ai and watsonx.orchestrate
+        across finance, HR, and energy domains, serving \textbf{5,000+} internal and client users; built the
+        supporting inference, ranking, and feedback microservices, containerized with Podman on IBM Cloud
+        Code Engine with auto-scaling, absorbing 3x traffic growth without redesign.
+  \item \focus{IBM Client Engineering asset.} Built \textbf{Ask-Git}, a production code-intelligence accelerator adopted by IBM Client
+        Engineering through CE Coach and reused across client engagements; combined LangChain, GitHub APIs,
+        and vector stores to query commits, file-level changes, and pull-request metadata across repositories.
+  \item \focus{Retrieval quality.} Designed end-to-end pipelines (ingestion, chunking, embedding, vector indexing, ranking,
+        LLM synthesis) processing \textbf{1M+ documents at sub-2s} median latency; implemented hybrid search across
+        Elasticsearch and Watson Discovery, improving retrieval precision by 28\% and reducing
+        hallucination-related escalations by 35\%.
+  \item \focus{Reliable agents.} Designed structured JSON contract outputs and observability for tool-calling
+        pipelines, reducing parsing failures by \textbf{90\%} and debugging time by 45\%; drove evaluation-driven
+        prompt engineering, LoRA adapter fine-tuning, and grounding strategies, improving answer
+        consistency by 22\% across evaluation benchmarks.
+  \item \focus{Insurance-agent product.} Built a \textbf{LangGraph Call Transcript Analyzer} for CI Financial, enabling
+        insurance agents to replace manual full-transcript skims with structured call summaries, tone, action
+        items, resolved issues and risks, and sales opportunities to inform policy conversations and selling.
+  \item \focus{Client-to-platform reuse.} Built a \textbf{LangGraph multi-agent resume-to-JD matching workflow} for OPG, cutting manual review
+        effort by \textbf{40\%}; productized the client-proven use case as a reusable watsonx Orchestrate asset
+        and extended the portfolio with natural-language-to-SQL and vision-language document-extraction agents.
+  \item \focus{Commercial and organizational leverage.} Influenced \textbf{USD 534K} in customer revenue
+        (USD 200K annual recurring) across three engagements; drove watsonx Orchestrate adoption across APAC
+        through enablement, reusable assets, mentoring, and architecture reviews.
+\end{itemize}
+
+\newpage
+%======================= EARLIER EXPERIENCE =======================
+\section*{EARLIER EXPERIENCE}
+\role{AI Engineer $\rightarrow$ Senior AI Engineer}{Sep 2021 -- Feb 2024}{Infilect}{Bengaluru, India}
+\begin{itemize}
+  \item Led six end-to-end AI deployments for global FMCG retail analytics, spanning Share-of-Shelf,
+        On-Shelf Availability, image retrieval, segmentation, and cross-modal LLM services.
+  \item Built product-identification models that computed Share-of-Shelf and On-Shelf Availability for major
+        brands; implemented reusable detection and OCR components that standardized capabilities across client deployments.
+  \item Built a cross-modal BLIP-2 brand-identification service that eliminated periodic product annotation,
+        pairing text and image understanding with reusable client-facing AI components.
+  \item Improved inference efficiency by 25\% with Patch2Pix and SAM pipelines; DINO-based retrieval reduced
+        manual workflows by 35\%, while LLM services cut annotation effort by 40\%.
+  \item Architected deep-learning microservices with Docker, Kubernetes, Redis, nginx, and TensorRT.
+\end{itemize}
+
+\role{Computer Vision Engineer}{Jan 2020 -- Sep 2021}{Drishte}{Bengaluru, India}
+\begin{itemize}
+  \item Built crowd-analytics and mobile face-recognition systems covering tracking, detection,
+        classification, and re-identification.
+  \item Deployed models to Jetson Nano and edge devices with TensorRT, OpenVINO, and TensorFlow Lite;
+        improved accuracy by 20\% and automated CI/CD to cut deployment time by 30\%.
+\end{itemize}
+
+%======================= TOOLKIT =======================
+\section*{TOOLKIT}
+{\color{accent}\bfseries Agentic AI:} LangGraph, LangChain, Model Context Protocol (MCP), ReAct, multi-agent orchestration,
+tool calling, structured outputs, JSON Schema, evaluation-driven prompting, LoRA, VLMs\\[2pt]
+{\color{accent}\bfseries Retrieval \& Data:} RAG, hybrid search, Elasticsearch, Watson Discovery, FAISS, sqlite-vec, BM25,
+cross-encoder reranking, chunking/embedding pipelines, natural-language-to-SQL\\[2pt]
+{\color{accent}\bfseries Platform \& Delivery:} Python, TypeScript, Rust, SQL, FastAPI, OpenShift (oc, cpd-cli), Kubernetes,
+Docker, Podman, Kafka, Redis, PostgreSQL, Terraform, Vault, GitHub Actions, AWS, Azure, GCP\\[2pt]
+{\color{accent}\bfseries AI Platforms:} watsonx.orchestrate (ADK), watsonx.ai, watsonx.governance, IBM Knowledge Catalog,
+Cloud Pak for Data, OpenAI, Anthropic, Gemini, vLLM, Ollama, NVIDIA NIM\\[2pt]
+{\color{accent}\bfseries Computer Vision:} PyTorch, TensorFlow, OpenCV, TensorRT, OpenVINO, SAM, BLIP-2, DINO
+
+%======================= EDUCATION =======================
+\section*{EDUCATION}
+\textbf{BE, Electronics and Communication}, SLN College, VTU, Karnataka \hfill 2016 -- 2020 \,$\cdot$\, \textit{CGPA: 8.0/10}
+
+\end{document}
+
+% =====================================================================
+% OPEN ITEMS
+%
+%  1. Verify former employer spelling before sending: "Drishte".
+%     ("Inflect" was already corrected to "Infilect".)
+%  2. Alpha Forge removed at your request (incomplete). Reinstate when
+%     the backtest/paper-trading loop is closed end to end.
+% =====================================================================

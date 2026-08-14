@@ -104,7 +104,8 @@ export const site: SiteContent = {
     },
   ],
 
-  resumeHref: asset("/resume.pdf"),
+  resumeHref:
+    "https://raw.githubusercontent.com/pradeepA2125/pradeep-site/main/resume/resume.pdf",
 
   interstitial: {
     quote: "Engineering is a major part of my life. It isn't my entire identity.",
