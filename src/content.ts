@@ -1,6 +1,18 @@
 import type { SiteContent } from "./content.types";
 
 /**
+ * Prefixes a public-directory path with the deploy base.
+ *
+ * Vite rewrites asset paths it can see in imports, but plain strings like
+ * "/img/train.webp" are invisible to it — under a subpath deploy (GitHub
+ * Pages serves this repo from /pradeep-site/) every one of them would 404.
+ * Routing asset paths through here is the single place that stays correct
+ * for both root-hosted and subpath-hosted deploys.
+ */
+const asset = (path: string) =>
+  `${import.meta.env.BASE_URL.replace(/\/$/, "")}/${path.replace(/^\//, "")}`;
+
+/**
  * The single source of content for the whole site.
  *
  * Every user-visible string, number, link, and asset path lives here.
@@ -16,7 +28,7 @@ export const site: SiteContent = {
     headline: "Still figuring it out,\nat speed.",
     body: "I get deeply interested in things and learn by building them. Right now that means agentic systems and retrieval — and six days a week on the mats.",
     photo: {
-      src: "/img/train.webp",
+      src: asset("/img/train.webp"),
       alt: "Pradeep leaning out of the window of the Nilgiri Mountain Railway as it climbs through forest toward Ooty",
       width: 1600,
       height: 2133,
@@ -89,13 +101,13 @@ export const site: SiteContent = {
     },
   ],
 
-  resumeHref: "/resume.pdf",
+  resumeHref: asset("/resume.pdf"),
 
   interstitial: {
     quote: "Engineering is a major part of my life. It isn't my entire identity.",
     attribution: "Which is the whole point of the rest of this page.",
     photo: {
-      src: "/img/stump.webp",
+      src: asset("/img/stump.webp"),
       alt: "Pradeep sitting cross-legged on a fallen tree trunk in dense green forest",
       width: 1200,
       height: 1125,
@@ -112,7 +124,7 @@ export const site: SiteContent = {
       { name: "Press", value: "60 kg" },
     ],
     photo: {
-      src: "/img/mma.webp",
+      src: asset("/img/mma.webp"),
       alt: "Pradeep with training partners and coaches on the mats at Kranos MMA in Bengaluru",
       width: 1600,
       height: 1200,
@@ -123,7 +135,7 @@ export const site: SiteContent = {
     heading: "Riding",
     body: "A KTM 390 Adventure and a preference for mountain roads. Long rides are how I get away from screens — Bengaluru to Ooty and back, exploring rather than sightseeing.",
     photo: {
-      src: "/img/bike.webp",
+      src: asset("/img/bike.webp"),
       alt: "Pradeep sitting on his orange and black KTM 390 Adventure under pine trees",
       width: 1000,
       height: 1778,
