@@ -12,7 +12,9 @@
     "preview": "vite preview",
     "lint": "oxlint",
     "check:links": "node scripts/check-links.mjs",
-    "photos": "node scripts/process-photos.mjs"
+    "photos": "node scripts/process-photos.mjs",
+    "redact": "node scripts/redact-plate.mjs",
+    "shoot": "node scripts/shoot.mjs"
   },
   "keywords": [],
   "author": "",
