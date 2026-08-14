@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .DS_Store
+.crucible
 *.tsbuildinfo
 
 # Source photography: large, and bike-original.jpg holds the unredacted
