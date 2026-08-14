@@ -29,10 +29,10 @@ export default function Training() {
                       {lift.value}
                     </span>
                   </div>
+                  {/* Decorative: the dt/dd pair above already carries the value. */}
                   <div
+                    aria-hidden="true"
                     className="h-1.5 overflow-hidden rounded-full bg-white/8"
-                    role="img"
-                    aria-label={`${lift.name}: ${lift.value}`}
                   >
                     <div
                       className="h-full rounded-full bg-gradient-to-r from-rose to-ember transition-transform duration-1000 ease-out"

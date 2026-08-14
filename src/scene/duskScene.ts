@@ -160,16 +160,18 @@ void main() {
 
     col = mix(col, lc, m);
 
-    // the rider: one headlight tracing the nearest ridge
-    if (i == LAYERS - 1) {
+    // the rider: one headlight working along the middle ridge, up near the
+    // skyline where it reads against the glow. Nearer ridges composite
+    // after this, so they occlude the light as it passes behind them.
+    if (i == LAYERS / 2) {
       float t = fract(uTime * 0.014);
       float hx = mix(-0.12, 1.12, t);
-      float hy = ridge(hx, fi, depth, drift) + 0.006;
+      float hy = ridge(hx, fi, depth, drift) + 0.009;
       vec2 d = (uv - vec2(hx, hy)) * vec2(aspect, 1.0);
-      float glow = 0.00035 / (dot(d, d) + 0.000045);
+      float glow = 0.00045 / (dot(d, d) + 0.00004);
       // trees between the road and us — the light flickers through them
       float flick = 0.35 + 0.65 * smoothstep(0.28, 0.72, noise(vec2(uTime * 1.9, 5.2)));
-      col += vec3(1.0, 0.85, 0.62) * min(glow, 2.2) * flick;
+      col += vec3(1.0, 0.85, 0.62) * min(glow, 2.4) * flick;
     }
   }
 
@@ -254,7 +256,10 @@ export function createDuskScene(
   let raf = 0;
   let running = false;
   let destroyed = false;
-  const t0 = performance.now();
+  // Start the clock 33s in: the headlight's crossing is ~71s, and this
+  // offset puts it mid-frame the moment the scene fades in, instead of
+  // making the first visitor wait ten seconds for it to enter.
+  const t0 = performance.now() - 33_000;
   // Pointer eases toward the target so parallax feels weighted, not jittery.
   let px = 0;
   let py = 0;

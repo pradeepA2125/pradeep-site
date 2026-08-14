@@ -18,7 +18,7 @@ export default function Hero() {
       {/* Single legibility scrim — the scene is dark already. */}
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-night via-night/70 to-transparent"
+        className="absolute inset-x-0 bottom-0 h-[68%] bg-gradient-to-t from-night via-night/70 to-transparent sm:h-[55%]"
       />
 
       <div className="relative z-10 mx-auto w-full max-w-6xl px-5 pt-28 pb-20 sm:px-8 sm:pb-24">
@@ -33,7 +33,7 @@ export default function Hero() {
             <p className="max-w-xl text-lg leading-relaxed text-ink-2">{body}</p>
             <a
               href={cta.href}
-              className="group mt-8 inline-flex items-center gap-3 rounded-full border border-ember/50 bg-ember/10 px-6 py-3 font-mono text-sm text-ember transition-colors hover:bg-ember hover:text-night"
+              className="group mt-8 inline-flex items-center gap-3 rounded-full border border-ember/60 bg-night/70 px-6 py-3 font-mono text-sm text-ember backdrop-blur-sm transition-colors hover:bg-ember hover:text-night"
             >
               {cta.label}
               <span
