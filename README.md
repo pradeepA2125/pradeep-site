@@ -17,6 +17,29 @@ capped (and resolution scaled down) on low-core devices.
 The shader palette is hard-coded to the CSS tokens in `src/index.css` —
 change one, change both.
 
+## Scroll effects
+
+Scrolling is the journey the page describes, so the motion rides it —
+never jacks it (no snapping, no smooth-scroll libraries, no wheel
+handlers). `src/lib/scrollDriver.ts` is the page's **single** scroll
+listener: passive, rAF-coalesced, zero work while idle. Everything
+scroll-linked writes transforms/uniforms only.
+
+- **The descent** — a `uScroll` uniform in the dusk shader: as the hero
+  scrolls out, near ridges rise faster than far ones, the ember light
+  drains, stars strengthen. Night falls as you leave the summit.
+- **The route draws** — waypoint hairlines draw on arrival; the Work
+  timeline's ember line draws with scroll and each role's dot ignites as
+  the line reaches it.
+- **Evidence counts up** — metric digits run 0 → target on reveal, landing
+  on the `content.ts` string verbatim (round-trip tested).
+- **Prints settle** — the Training/Riding field notes drop into their pins
+  with a back-out overshoot; the interstitial photo drifts against the
+  scroll (IO-gated, only subscribed while near the viewport).
+
+`prefers-reduced-motion` disables all of it: the scene is a still, the
+route renders fully drawn, metrics show final values, nothing moves.
+
 ## Develop
 
 ```bash
