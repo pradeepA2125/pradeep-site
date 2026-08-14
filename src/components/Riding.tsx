@@ -1,8 +1,11 @@
 import { site } from "../content";
 import Section from "./Section";
+import { useReveal } from "../hooks/useReveal";
 
 export default function Riding() {
   const { body, routeNote, photo } = site.riding;
+  // Same settle as the Training print — the two field notes pin alike.
+  const figureReveal = useReveal<HTMLElement>();
 
   return (
     <Section id="riding" meta={site.sections.riding}>
@@ -11,7 +14,14 @@ export default function Riding() {
           The bike shot is a tall portrait; at full column width it towers
           over a short paragraph. Capping height keeps the columns balanced.
         */}
-        <figure className="rotate-1 bg-ink p-2 pb-3 shadow-[0_24px_60px_-12px_rgba(0,0,0,0.6)] transition-transform duration-500 hover:rotate-0 md:order-last">
+        <figure
+          ref={figureReveal.ref}
+          className={`bg-ink p-2 pb-3 shadow-[0_24px_60px_-12px_rgba(0,0,0,0.6)] transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:rotate-0 md:order-last ${
+            figureReveal.revealed
+              ? "rotate-1 translate-y-0 opacity-100"
+              : "rotate-4 translate-y-6 opacity-0"
+          }`}
+        >
           <img
             src={photo.src}
             alt={photo.alt}

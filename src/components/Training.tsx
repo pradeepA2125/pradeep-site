@@ -10,6 +10,9 @@ const maxKg = Math.max(
 export default function Training() {
   const { body, lifts, photo } = site.training;
   const { ref, revealed } = useReveal<HTMLDivElement>();
+  // The print settles into its pin: drops in from a looser angle with a
+  // slight overshoot (back-out bezier), like a photo pressed onto the page.
+  const figureReveal = useReveal<HTMLElement>();
 
   return (
     <Section id="training" meta={site.sections.training}>
@@ -49,7 +52,14 @@ export default function Training() {
             })}
           </div>
         </div>
-        <figure className="-rotate-1 bg-ink p-2 pb-3 shadow-[0_24px_60px_-12px_rgba(0,0,0,0.6)] transition-transform duration-500 hover:rotate-0">
+        <figure
+          ref={figureReveal.ref}
+          className={`bg-ink p-2 pb-3 shadow-[0_24px_60px_-12px_rgba(0,0,0,0.6)] transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:rotate-0 ${
+            figureReveal.revealed
+              ? "-rotate-1 translate-y-0 opacity-100"
+              : "-rotate-4 translate-y-6 opacity-0"
+          }`}
+        >
           <img
             src={photo.src}
             alt={photo.alt}
