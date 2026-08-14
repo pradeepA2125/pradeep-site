@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { DuskSceneHandle } from "../scene/duskScene";
+import { subscribeScroll } from "../lib/scrollDriver";
 
 /**
  * Mounts the WebGL dusk scene behind the hero copy.
@@ -30,6 +31,7 @@ export default function HeroScene() {
     let visible = true;
     let reduced = false;
     let observer: IntersectionObserver | undefined;
+    let unsubscribeScroll: (() => void) | undefined;
 
     const onVisibility = () => {
       const scene = sceneRef.current;
@@ -68,6 +70,16 @@ export default function HeroScene() {
       scene.start();
       setLive(true);
 
+      // Scroll-linked descent: 0 with the hero fully in view → 1 once it has
+      // scrolled past. The hero starts at the top of the page, so scrollY
+      // over the hero height is the whole computation — one clientHeight
+      // read against a clean layout (all scroll-frame writes on this page
+      // are transforms/uniforms, so nothing dirties it mid-frame).
+      // Skipped under reduced motion (the scene renders one still above).
+      unsubscribeScroll = subscribeScroll((scrollY) => {
+        scene.setScroll(scrollY / Math.max(canvas.clientHeight, 1));
+      });
+
       document.addEventListener("visibilitychange", onVisibility);
       if (typeof IntersectionObserver !== "undefined") {
         observer = new IntersectionObserver(
@@ -96,6 +108,7 @@ export default function HeroScene() {
       }
       document.removeEventListener("visibilitychange", onVisibility);
       observer?.disconnect();
+      unsubscribeScroll?.();
       sceneRef.current?.destroy();
       sceneRef.current = null;
     };

@@ -26,6 +26,12 @@ export interface DuskSceneHandle {
   renderStill(): void;
   /** Pointer parallax, both axes in [-1, 1]. */
   setPointer(x: number, y: number): void;
+  /**
+   * Scroll-linked descent, in [0, 1]: 0 = hero fully in view, 1 = scrolled
+   * past. Ridges rise through the frame (near faster than far), the ember
+   * light drains, stars strengthen — night falls as you leave the summit.
+   */
+  setScroll(progress: number): void;
   destroy(): void;
 }
 
@@ -40,6 +46,7 @@ precision highp float;
 uniform vec2 uRes;
 uniform float uTime;
 uniform vec2 uPointer;
+uniform float uScroll; // 0 = at the summit, 1 = descended past the hero
 
 // Palette — must track the CSS tokens in index.css.
 const vec3 NIGHT = vec3(0.078, 0.071, 0.145);  // #141225
@@ -104,21 +111,26 @@ void main() {
   vec2 uv = gl_FragCoord.xy / uRes;
   float aspect = uRes.x / uRes.y;
 
+  // The descent: as the page scrolls, the last of the light drains out.
+  // "lastLight" gates every warm term so the whole horizon dies together.
+  float lastLight = 1.0 - uScroll * 0.72;
+
   // ---- sky -------------------------------------------------------------
   float up = clamp((uv.y - HORIZON) / (1.0 - HORIZON), 0.0, 1.0);
   vec3 col = mix(DUSK, NIGHT, pow(up, 0.60));
+  col = mix(col, NIGHT, uScroll * 0.38); // night settles over the dusk blue
 
   // ember band hugging the horizon, strongest near the sun azimuth
   float azim = exp(-pow((uv.x - SUN_X) * 1.7, 2.0));
   float band = exp(-pow(max(uv.y - HORIZON, 0.0) * 7.0, 1.5));
-  col = mix(col, ROSE, band * 0.62);
-  col += EMBER * band * azim * 0.60;
+  col = mix(col, ROSE, band * 0.62 * mix(1.0, 0.55, uScroll));
+  col += EMBER * band * azim * 0.60 * lastLight;
 
   // sun glow — the light itself has already dropped behind the far ridge
   vec2 sunD = vec2((uv.x - SUN_X) * aspect, (uv.y - HORIZON) * 1.35);
   float sun = exp(-dot(sunD, sunD) * 18.0);
-  col += GOLD * sun * 0.50;
-  col += EMBER * exp(-dot(sunD, sunD) * 4.0) * 0.22;
+  col += GOLD * sun * 0.50 * lastLight;
+  col += EMBER * exp(-dot(sunD, sunD) * 4.0) * 0.22 * lastLight;
 
   // ---- stars -----------------------------------------------------------
   float starMask = smoothstep(0.12, 0.75, up);
@@ -130,7 +142,9 @@ void main() {
       vec2 centre = cell + 0.5 + (vec2(hash(cell + 1.3), hash(cell + 2.7)) - 0.5) * 0.6;
       float d = length(sp - centre);
       float tw = 0.6 + 0.4 * sin(uTime * (0.8 + h * 2.0) + h * 43.0);
-      col += vec3(0.85, 0.87, 1.0) * smoothstep(0.45, 0.0, d) * tw * starMask * 0.8;
+      // stars come out as the light drains
+      col += vec3(0.85, 0.87, 1.0) * smoothstep(0.45, 0.0, d) * tw * starMask
+           * 0.8 * (1.0 + 0.8 * uScroll);
     }
   }
 
@@ -145,8 +159,12 @@ void main() {
     float depth = fi / float(LAYERS - 1);
     float drift = uTime * mix(0.006, 0.024, depth)
                 + uPointer.x * mix(0.008, 0.05, depth);
+    // scroll parallax: descending past the ridges, the near ones rise
+    // through the frame faster than the far ones — real depth, not a slide
+    float rise = uScroll * mix(0.03, 0.20, depth);
     float y = ridge(uv.x, fi, depth, drift)
-            + uPointer.y * mix(0.002, 0.012, depth);
+            + uPointer.y * mix(0.002, 0.012, depth)
+            + rise;
     float m = 1.0 - smoothstep(y - edge, y + edge, uv.y);
 
     // aerial perspective: far ridges dissolve into the warm haze
@@ -156,7 +174,7 @@ void main() {
 
     // ember rim where a crest catches the last of the light
     float crest = exp(-max(y - uv.y, 0.0) * 90.0);
-    lc += EMBER * crest * (1.0 - depth) * azim * 0.35;
+    lc += EMBER * crest * (1.0 - depth) * azim * 0.35 * lastLight;
 
     col = mix(col, lc, m);
 
@@ -166,7 +184,8 @@ void main() {
     if (i == LAYERS / 2) {
       float t = fract(uTime * 0.014);
       float hx = mix(-0.12, 1.12, t);
-      float hy = ridge(hx, fi, depth, drift) + 0.009;
+      // + rise keeps the light glued to its ridge as the ridge climbs
+      float hy = ridge(hx, fi, depth, drift) + 0.009 + rise;
       vec2 d = (uv - vec2(hx, hy)) * vec2(aspect, 1.0);
       float glow = 0.00045 / (dot(d, d) + 0.00004);
       // trees between the road and us — the light flickers through them
@@ -247,6 +266,7 @@ export function createDuskScene(
   const uRes = gl.getUniformLocation(program, "uRes");
   const uTime = gl.getUniformLocation(program, "uTime");
   const uPointer = gl.getUniformLocation(program, "uPointer");
+  const uScroll = gl.getUniformLocation(program, "uScroll");
 
   // Mid-range Androids fall over on full-DPR fullscreen shaders; the scene
   // is soft gradients, so a lower internal resolution is invisible.
@@ -265,6 +285,10 @@ export function createDuskScene(
   let py = 0;
   let tx = 0;
   let ty = 0;
+  // Scroll eases too, but tighter (0.16 vs 0.045): it must track the finger
+  // closely — a floaty scroll link reads as lag, not weight.
+  let sc = 0;
+  let scTarget = 0;
 
   const resize = () => {
     const dpr = Math.min(window.devicePixelRatio || 1, dprCap) * scale;
@@ -281,9 +305,11 @@ export function createDuskScene(
     resize();
     px += (tx - px) * 0.045;
     py += (ty - py) * 0.045;
+    sc += (scTarget - sc) * 0.16;
     gl.uniform2f(uRes, canvas.width, canvas.height);
     gl.uniform1f(uTime, elapsedMs / 1000);
     gl.uniform2f(uPointer, px, py);
+    gl.uniform1f(uScroll, sc);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   };
 
@@ -315,6 +341,9 @@ export function createDuskScene(
     setPointer(x: number, y: number) {
       tx = x;
       ty = y;
+    },
+    setScroll(progress: number) {
+      scTarget = Math.min(Math.max(progress, 0), 1);
     },
     destroy() {
       destroyed = true;
